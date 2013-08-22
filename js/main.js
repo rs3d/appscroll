@@ -5,7 +5,7 @@ require.config({
     'jquery': '../vendor/jquery/jquery',
     'underscore': '../vendor/underscore-amd/underscore',
     'backbone': '../vendor/backbone-amd/backbone',
-    'ftscroller': '../vendor/ftscroller/lib/ftscroller',
+    'ftscroller': 'require/ftscroller',
     //'jquerypp': '../vendor/jquerypp',
 
   },

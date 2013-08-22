@@ -1,10 +1,10 @@
 define([
-	'modernizr',
-	'jquery',
-	'underscore',
-	'backbone',
-	'ftscroller',
-	'app/vent',
+		'modernizr',
+		'jquery',
+		'underscore',
+		'backbone',
+		'ftscroller',
+		'app/vent',
 ], function(Modernizr, $, _, Backbone, FTScroller, vent) {
 	'use strict';
 
@@ -34,14 +34,31 @@ define([
 				scrollingX: false,
 				scrollbars: false,
 				snapping: true,
-				paginatedSnap: true
-
-				//snapSizeY: 100
+				paginatedSnap: true,
+				snapSizeY: this.getDimensions()
 			});
 			console.log(scroller);
 
 			// EVENTS
 			this.listenTo(vent, 'Router', this.router, this);
+
+		},
+
+		getDimensions: function($el) {
+			var dimensions = [];
+
+			dimensions = [{
+					width: 400,
+					height: 500
+				}, {
+					width: 400,
+					height: 100
+				}, {
+					width: 400,
+					height: 200
+				}
+			];
+			return dimensions;
 
 		},
 

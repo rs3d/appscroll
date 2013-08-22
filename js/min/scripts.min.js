@@ -14388,10 +14388,11 @@ var FTScroller, CubicBezier;
 			}
 
 			// If snap grid size options were supplied, store them
-			if (options.hasOwnProperty('snapSizeX') && !isNaN(options.snapSizeX)) {
+			if (options.hasOwnProperty('snapSizeX') && Object.prototype.toString.call(options.snapSizeX) == '[object Array]') {
 				_snapGridSize.userX = _snapGridSize.x = options.snapSizeX;
+
 			}
-			if (options.hasOwnProperty('snapSizeY') && !isNaN(options.snapSizeY)) {
+			if (options.hasOwnProperty('snapSizeY') && Object.prototype.toString.call(options.snapSizeY) == '[object Array]') {
 				_snapGridSize.userY = _snapGridSize.y = options.snapSizeY;
 			}
 
@@ -14470,6 +14471,7 @@ var FTScroller, CubicBezier;
 		 * using the bounding box, eg page-at-a-time.
 		 */
 		setSnapSize = function setSnapSize(width, height) {
+			console.error('setSnapSize');
 			_snapGridSize.userX = width;
 			_snapGridSize.userY = height;
 			_snapGridSize.x = width;
@@ -15413,6 +15415,15 @@ var FTScroller, CubicBezier;
 			}, 100);
 		};
 
+		_sumDimensionGrid = function _sumDimensionGrid(grid) {
+			var dimensions = { width: 0, height: 0};
+			grid.forEach (function(el){
+				dimensions.width += el.width;
+				dimensions.height += el.height;
+			});
+			return dimensions;
+		};
+
 		_updateDimensions = function _updateDimensions(ignoreSnapScroll) {
 			var axis;
 
@@ -15449,13 +15460,30 @@ var FTScroller, CubicBezier;
 			containerHeight = _containerNode.offsetHeight;
 
 			// Grab the dimensions
-			var rawScrollWidth = options.contentWidth || _contentParentNode.offsetWidth;
-			var rawScrollHeight = options.contentHeight || _contentParentNode.offsetHeight;
+			// If snap grid size options were supplied, store them
+			if (_snapGridSize.x ) {
+				var rawScrollWidth = _sumDimensionGrid(_snapGridSize.x).width;
+			}else {
+				var rawScrollWidth = options.contentWidth || _contentParentNode.offsetWidth;
+
+			}
+			if (_snapGridSize.y ) {
+				var rawScrollHeight = _sumDimensionGrid(_snapGridSize.y).height;
+			}else {
+				var rawScrollHeight = options.contentHeight || _contentParentNode.offsetHeight;
+			}
+			/*console.log(_snapGridSize.y);
+			var test = _sumDimensionGrid(_snapGridSize.y);
+			console.log(test);*/
+
+
+
 			var scrollWidth = rawScrollWidth;
 			var scrollHeight = rawScrollHeight;
 			var targetPosition = { x: false, y: false };
 
 			// Update snap grid
+			console.error('Update snap grid', scrollHeight);
 			if (!_snapGridSize.userX) {
 				_snapGridSize.x = containerWidth;
 			}
@@ -15464,7 +15492,7 @@ var FTScroller, CubicBezier;
 			}
 
 			// If there is a grid, conform to the grid
-			if (_instanceOptions.snapping) {
+			/*if (_instanceOptions.snapping) {
 				if (_snapGridSize.userX) {
 					scrollWidth = Math.ceil(scrollWidth / _snapGridSize.userX) * _snapGridSize.userX;
 				} else {
@@ -15475,7 +15503,9 @@ var FTScroller, CubicBezier;
 				} else {
 					scrollHeight = Math.ceil(scrollHeight / _snapGridSize.y) * _snapGridSize.y;
 				}
-			}
+			}*/
+
+			console.log('_snapGridSize',_snapGridSize, 'scrollWidth', scrollWidth, 'scrollHeight', scrollHeight);
 
 			// If no details have changed, return.
 			if (_metrics.container.x === containerWidth && _metrics.container.y === containerHeight && _metrics.content.x === scrollWidth && _metrics.content.y === scrollHeight) {
@@ -15491,7 +15521,7 @@ var FTScroller, CubicBezier;
 			_metrics.content.rawY = rawScrollHeight;
 			_metrics.scrollEnd.x = containerWidth - scrollWidth;
 			_metrics.scrollEnd.y = containerHeight - scrollHeight;
-
+console.log('_metrics', _metrics);
 			_updateScrollbarDimensions();
 
 			// Apply base alignment if appropriate
@@ -15530,6 +15560,7 @@ var FTScroller, CubicBezier;
 			if (!ignoreSnapScroll && _snapScroll()) {
 				_updateSegments(true);
 			}
+			console.log('targetPosition',targetPosition);
 		};
 
 		_updateScrollbarDimensions = function _updateScrollbarDimensions() {
@@ -15609,6 +15640,7 @@ var FTScroller, CubicBezier;
 					_fireEvent('segmentdidchange', { segmentX: newSegment.x, segmentY: newSegment.y });
 				}
 			}
+			console.log('newSegment',newSegment,'_baseSegment', _baseSegment);
 		};
 
 		_setAxisPosition = function _setAxisPosition(axis, position, animationDuration, animationBezier, boundsCrossDelay) {
@@ -16624,12 +16656,12 @@ define('app/vent',[
 	return vent;
 });
 define('app/app',[
-	'modernizr',
-	'jquery',
-	'underscore',
-	'backbone',
-	'ftscroller',
-	'app/vent',
+		'modernizr',
+		'jquery',
+		'underscore',
+		'backbone',
+		'ftscroller',
+		'app/vent',
 ], function(Modernizr, $, _, Backbone, FTScroller, vent) {
 	
 
@@ -16659,14 +16691,31 @@ define('app/app',[
 				scrollingX: false,
 				scrollbars: false,
 				snapping: true,
-				paginatedSnap: true
-
-				//snapSizeY: 100
+				paginatedSnap: true,
+				snapSizeY: this.getDimensions()
 			});
 			console.log(scroller);
 
 			// EVENTS
 			this.listenTo(vent, 'Router', this.router, this);
+
+		},
+
+		getDimensions: function($el) {
+			var dimensions = [];
+
+			dimensions = [{
+					width: 400,
+					height: 500
+				}, {
+					width: 400,
+					height: 100
+				}, {
+					width: 400,
+					height: 200
+				}
+			];
+			return dimensions;
 
 		},
 
@@ -16756,7 +16805,7 @@ require.config({
     'jquery': '../vendor/jquery/jquery',
     'underscore': '../vendor/underscore-amd/underscore',
     'backbone': '../vendor/backbone-amd/backbone',
-    'ftscroller': '../vendor/ftscroller/lib/ftscroller',
+    'ftscroller': 'require/ftscroller',
     //'jquerypp': '../vendor/jquerypp',
 
   },
