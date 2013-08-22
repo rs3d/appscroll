@@ -1,0 +1,15 @@
+{
+  "name": "RequireJS Starter",
+  "version": "1.0.0",
+  "dependencies": {
+    "almond": "latest",
+    "requirejs": "latest",
+    "jquery": "1.8.3",
+    "backbone-amd": "latest",
+    "underscore-amd": "latest",
+    "es5-shim": "latest"
+  },
+  "devDependencies": {
+    "ftscroller": "~0.2.2"
+  }
+}

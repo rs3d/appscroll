@@ -1,0 +1,166 @@
+blockquote,  dl, fieldset,  h1, h2, h3, h4, h5, h6, iframe, ol, p, table, tbody, textarea, ul {
+	margin: 0;
+	padding: 0 0 1em 0;
+}
+mark,
+h1, h2, h3, h4, h5, h6 {
+	font-size: 20px;
+	line-height: 1.3em;
+	padding: 2.5em 0 1em 0;
+	font-weight: @font_bold;
+}
+h1 {
+}
+
+h2 {
+}
+
+h3 {
+	padding-top: 0;
+	padding-bottom: 2.5em;
+}
+h4 {
+}
+	
+h5 {
+}
+h6 { 
+
+}
+
+p {
+
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+th, td {
+	vertical-align: top;
+	padding: 0 5px 0 0;
+	padding-bottom: 1.5em;
+	outline: 0;
+	border: 0;
+	
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+th {
+	color: #ecac13;
+	white-space:nowrap;
+	text-align: left;
+	padding-right: 2.5em;
+	font-weight: bold;
+}
+pre, tt, code {
+	display: inline;
+   	font-family: @font_mono;
+   	background-color: #f5f5f5;
+	white-space: pre-wrap;
+	word-break: break-all;
+	word-wrap: break-word;
+	padding: 0.25em;
+	border: 1px solid #ccc;
+
+	&.block {
+		display: block;
+		//padding: 0.25em;
+	}
+	&.half {
+		max-width: 50%;
+		z-index: 2;
+		position: relative;	
+		.transition(max-width);
+
+		&:before {
+			content: '';
+			overflow: auto;
+			display: block;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			z-index: -1;
+			left: 0;
+			top: 0;
+		}
+		&:hover{
+			max-width: 100%;
+		}
+	}
+	
+}
+
+
+img {
+	border: 0;
+}
+
+strong {
+	font-weight: @font_bold
+}
+
+a {
+	color: @link_color;
+	text-decoration: underline;
+	//&:link, 
+	&:hover,
+	&:focus, 
+	&:active, 
+	&:visited {
+		color: @link_color;
+		text-decoration: none;
+		
+    outline: none;
+    border: 0;
+	}
+	&:hover,
+	&:focus {
+		color: @link_color_hover;
+		text-decoration: underline;
+	}
+	&:active {
+		color: @link_color_click;
+	}
+}
+a:active, a:focus {
+   outline:  none;
+}
+
+
+ul li {
+	//list-style: none;
+	margin-left: 2em;
+}
+
+ 
+
+ol {
+	
+}
+
+
+.small {
+	font-size: 75%;
+}
+.big {
+	font-size: 150%;
+}
+
+fieldset {
+ border: 0;
+ clear: both;
+ .clearfix();
+}
+
+label {
+white-space: inherit;
+
+}
+input,
+input:focus {
+	outline: none;
+}
+img.right {
+	float: right;
+	padding-right: 110px;
+}
