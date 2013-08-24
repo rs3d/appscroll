@@ -34,7 +34,7 @@ define([
 				scrollingX: false,
 				scrollbars: false,
 				snapping: true,
-				paginatedSnap: true,
+				//paginatedSnap: true,
 				snapSizeY: this.getDimensions()
 			});
 			console.log(scroller);
@@ -48,14 +48,23 @@ define([
 			var dimensions = [];
 
 			dimensions = [{
-					width: 400,
-					height: 500
+					x: 400,
+					y: 300
 				}, {
-					width: 400,
-					height: 100
+					x: 400,
+					y: 400
 				}, {
-					width: 400,
-					height: 200
+					x: 400,
+					y: 500
+				}, {
+					x: 400,
+					y: 200
+				}, {
+					x: 400,
+					y: 350
+				}, {
+					x: 400,
+					y: 400
 				}
 			];
 			return dimensions;

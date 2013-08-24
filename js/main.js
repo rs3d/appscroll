@@ -5,7 +5,7 @@ require.config({
     'jquery': '../vendor/jquery/jquery',
     'underscore': '../vendor/underscore-amd/underscore',
     'backbone': '../vendor/backbone-amd/backbone',
-    'ftscroller': 'require/ftscroller',
+    // 'ftscroller': 'require/ftscroller',
     //'jquerypp': '../vendor/jquerypp',
 
   },
@@ -20,12 +20,14 @@ require.config({
       deps: ['jquery', 'underscore'],
       exports: 'Backbone'
     },
-    ftscroller: {
+    /*ftscroller: {
       exports: 'FTScroller'
-    }
+    }*/
   }
 });
-
+define('ftscroller', function() {
+  return window.FTScroller;
+});
 define('modernizr', function() {
   return window.Modernizr;
 });

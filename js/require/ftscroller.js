@@ -39,7 +39,7 @@
  *
  * @copyright The Financial Times Ltd [All rights reserved]
  * @codingstandard ftlabs-jslint
- * @version 0.2.3
+ * @version 0.2.0
  */
 /**
  * @license FTScroller is (c) 2012 The Financial Times Ltd [All rights reserved] and licensed under the MIT license.
@@ -285,6 +285,10 @@ var FTScroller, CubicBezier;
 			userX: false,
 			userY: false
 		};
+		var accumulatedGridSize = {
+			x: false,
+			y: false
+		};
 		var _baseSegment = { x: 0, y: 0 };
 		var _activeSegment = { x: 0, y: 0 };
 
@@ -362,10 +366,11 @@ var FTScroller, CubicBezier;
 			}
 
 			// If snap grid size options were supplied, store them
-			if (options.hasOwnProperty('snapSizeX') && !isNaN(options.snapSizeX)) {
+			if (options.hasOwnProperty('snapSizeX') && Object.prototype.toString.call(options.snapSizeX) == '[object Array]') {
 				_snapGridSize.userX = _snapGridSize.x = options.snapSizeX;
+
 			}
-			if (options.hasOwnProperty('snapSizeY') && !isNaN(options.snapSizeY)) {
+			if (options.hasOwnProperty('snapSizeY') && Object.prototype.toString.call(options.snapSizeY) == '[object Array]') {
 				_snapGridSize.userY = _snapGridSize.y = options.snapSizeY;
 			}
 
@@ -444,6 +449,7 @@ var FTScroller, CubicBezier;
 		 * using the bounding box, eg page-at-a-time.
 		 */
 		setSnapSize = function setSnapSize(width, height) {
+			console.error('setSnapSize');
 			_snapGridSize.userX = width;
 			_snapGridSize.userY = height;
 			_snapGridSize.x = width;
@@ -655,7 +661,7 @@ var FTScroller, CubicBezier;
 			};
 			var targetPositions = { x: _baseScrollPosition.x + gesture.x, y: _baseScrollPosition.y + gesture.y };
 			var distancesBeyondBounds = _distancesBeyondBounds(targetPositions);
-
+			console.log('_updateScroll','distancesBeyondBounds',distancesBeyondBounds);
 			// Opera fix
 			if (inputTime <= 0) {
 				inputTime = Date.now();
@@ -902,6 +908,7 @@ var FTScroller, CubicBezier;
 		 * timeouts required.
 		 */
 		_flingScroll = function _flingScroll() {
+			console.info('_flingScroll', 'method');
 			var i, axis, movementSpeed, lastPosition, comparisonPosition, flingDuration, flingDistance, flingPosition, bounceDelay, bounceDistance, bounceDuration, bounceTarget, boundsBounce, modifiedDistance, flingBezier, timeProportion, boundsCrossDelay, flingStartSegment, beyondBoundsFlingDistance, baseFlingComponent;
 			var maxAnimationTime = 0;
 			var moveRequired = false;
@@ -1011,7 +1018,55 @@ var FTScroller, CubicBezier;
 
 					// In non-paginated snapping mode, snap to the nearest grid location to the target
 					} else if (_instanceOptions.snapping) {
-						bounceDistance = flingPosition - (Math.round(flingPosition / _snapGridSize[axis]) * _snapGridSize[axis]);
+						/*bounceDistance = flingPosition - (Math.round(flingPosition / _snapGridSize[axis]) * _snapGridSize[axis]);
+						bounceDistance = 500+flingPosition;
+						console.error('bounceDistance',bounceDistance,'flingPosition',flingPosition,'_lastScrollPosition[axis]',_lastScrollPosition[axis]);
+						*/
+
+						//flingStartSegment = -_lastScrollPosition[axis] / _snapGridSize[axis];
+
+						flingStartSegment = _getSegmentByCoords(axis,_lastScrollPosition[axis]);
+
+						var segmentTop = accumulatedGridSize[axis][flingStartSegment] - accumulatedGridSize[axis][0],
+							segmentNext = accumulatedGridSize[axis][flingStartSegment];
+
+
+						console.error('flingStartSegment',flingStartSegment,'flingPosition',flingPosition, 'segmentTop ',segmentTop,'segmentNext',segmentNext);
+
+
+						//next Segment
+						//flingPosition = 400;
+						///console.error(flingStartSegment, -accumulatedGridSize[axis][flingStartSegment], flingPosition);
+						//
+						if (flingStartSegment === 0 && flingPosition > 0 ) {
+							bounceDistance = segmentTop-flingPosition;
+							console.error('first segment top', 'bounceDistance',bounceDistance);
+
+						}else if (flingPosition < -segmentNext ) {
+							console.error('segment bottom', segmentTop, flingPosition);
+							bounceDistance = segmentNext + flingPosition;
+
+						/*}else if (flingPosition > -_snapGridSize[axis][flingStartSegment-1][axis]) {
+							console.error(-_snapGridSize[axis][flingStartSegment-1][axis], flingPosition);
+							bounceDistance = _snapGridSize[axis][flingStartSegment-1][axis];
+						*/}else if (flingPosition > -segmentNext)  {
+							console.error('next');
+							bounceDistance = segmentNext+flingPosition;
+							console.error('WORK TODO')
+						// Otherwise, if the movement speed was above the minimum velocity, continue
+						// in the move direction.
+						} else if (Math.abs(movementSpeed) > _kMinimumSpeed) {
+
+							// Determine the target segment
+							if (movementSpeed < 0) {
+								flingPosition = Math.floor(_lastScrollPosition[axis] / _snapGridSize[axis]) * _snapGridSize[axis];
+							} else {
+								flingPosition = Math.ceil(_lastScrollPosition[axis] / _snapGridSize[axis]) * _snapGridSize[axis];
+							}
+
+							flingDuration = Math.min(_instanceOptions.maxFlingDuration, flingDuration * (flingPosition - _lastScrollPosition[axis]) / flingDistance);
+						}
+
 					}
 
 					// Deal with cases where the target is beyond the bounds
@@ -1164,7 +1219,6 @@ var FTScroller, CubicBezier;
 		_snapScroll = function _snapScroll(scrollCancelled) {
 			var axis;
 			var snapDuration = scrollCancelled ? 100 : 350;
-
 			// Get the current position and see if a snap is required
 			var targetPosition = _getSnapPositionForPosition(_lastScrollPosition);
 			var snapRequired = false;
@@ -1220,6 +1274,7 @@ var FTScroller, CubicBezier;
 					// If a grid is present, find the nearest grid delineator.
 					if (_instanceOptions.snapping && _snapGridSize[axis]) {
 						coordinatesToReturn[axis] = Math.round(coordinates[axis] / _snapGridSize[axis]) * _snapGridSize[axis];
+
 						continue;
 					}
 
@@ -1227,7 +1282,8 @@ var FTScroller, CubicBezier;
 					coordinatesToReturn[axis] = coordinates[axis];
 				}
 			}
-
+		    coordinatesToReturn.y = coordinates.y;
+		    console.info('coordinatesToReturn',coordinatesToReturn);
 			return coordinatesToReturn;
 		};
 
@@ -1386,6 +1442,15 @@ var FTScroller, CubicBezier;
 			}, 100);
 		};
 
+		var _sumDimensionGrid = function _sumDimensionGrid(grid) {
+			var dimensions = { x: 0, y: 0};
+			grid.forEach (function(el){
+				dimensions.x += el.x;
+				dimensions.y += el.y;
+			});
+			return dimensions;
+		};
+
 		_updateDimensions = function _updateDimensions(ignoreSnapScroll) {
 			var axis;
 
@@ -1422,23 +1487,41 @@ var FTScroller, CubicBezier;
 			containerHeight = _containerNode.offsetHeight;
 
 			// Grab the dimensions
-			var rawScrollWidth = options.contentWidth || _contentParentNode.offsetWidth;
-			var rawScrollHeight = options.contentHeight || _contentParentNode.offsetHeight;
+			// If snap grid size options were supplied, store them
+			var rawScrollWidth = 0,
+				rawScrollHeight = 0;
+			if (_snapGridSize.x ) {
+				rawScrollWidth = _sumDimensionGrid(_snapGridSize.x).x;
+			}else {
+				rawScrollWidth = options.contentWidth || _contentParentNode.offsetWidth;
+			}
+			if (_snapGridSize.y ) {
+				rawScrollHeight = _sumDimensionGrid(_snapGridSize.y).y;
+			}else {
+				rawScrollHeight = options.contentHeight || _contentParentNode.offsetHeight;
+			}
+			/*console.log(_snapGridSize.y);
+			var test = _sumDimensionGrid(_snapGridSize.y);
+			console.log(test);*/
+
+
+
 			var scrollWidth = rawScrollWidth;
 			var scrollHeight = rawScrollHeight;
 			var targetPosition = { x: false, y: false };
 
 			// Update snap grid
+			console.error('Update snap grid');
 			if (!_snapGridSize.userX) {
 				_snapGridSize.x = containerWidth;
 			}
 			if (!_snapGridSize.userY) {
 				_snapGridSize.y = containerHeight;
 			}
-
+			_getAccumulatedGridSize(_snapGridSize);
 			// If there is a grid, conform to the grid
-			if (_instanceOptions.snapping) {
-				if (_snapGridSize.userX) {
+			/*if (_instanceOptions.snapping) {
+				if (_snapGridSize.userX && !isNaN(_snapGridSize.userX) ) {
 					scrollWidth = Math.ceil(scrollWidth / _snapGridSize.userX) * _snapGridSize.userX;
 				} else {
 					scrollWidth = Math.ceil(scrollWidth / _snapGridSize.x) * _snapGridSize.x;
@@ -1448,7 +1531,9 @@ var FTScroller, CubicBezier;
 				} else {
 					scrollHeight = Math.ceil(scrollHeight / _snapGridSize.y) * _snapGridSize.y;
 				}
-			}
+			}*/
+
+			console.log('_snapGridSize',_snapGridSize, 'scrollWidth', scrollWidth, 'scrollHeight', scrollHeight);
 
 			// If no details have changed, return.
 			if (_metrics.container.x === containerWidth && _metrics.container.y === containerHeight && _metrics.content.x === scrollWidth && _metrics.content.y === scrollHeight) {
@@ -1464,9 +1549,7 @@ var FTScroller, CubicBezier;
 			_metrics.content.rawY = rawScrollHeight;
 			_metrics.scrollEnd.x = containerWidth - scrollWidth;
 			_metrics.scrollEnd.y = containerHeight - scrollHeight;
-
-			console.log('_metrics', _metrics);
-
+console.log('_metrics', _metrics);
 			_updateScrollbarDimensions();
 
 			// Apply base alignment if appropriate
@@ -1531,6 +1614,7 @@ var FTScroller, CubicBezier;
 		};
 
 		_updateElementPosition = function _updateElementPosition() {
+			console.info('_updateElementPosition');
 			var axis, computedStyle, splitStyle;
 
 			// Retrieve the current position of each active axis.
@@ -1554,19 +1638,46 @@ var FTScroller, CubicBezier;
 			}
 		};
 
+		var _getAccumulatedGridSize = function _cumulateGridSize (grid) {
+			var axis;
+			accumulatedGridSize = {x: [], y: []};
+			for (axis in _scrollableAxes) {
+				if (!isNaN(grid[axis])) continue;
+				grid[axis].reduce(function(previousValue, currentValue, index, array){
+					var sum =  previousValue + currentValue[axis];
+					//console.log(currentValue[dim],sum);
+					accumulatedGridSize[axis].push(sum);
+					return sum;
+				},0);
+			}
+			console.log(accumulatedGridSize);
+			return accumulatedGridSize;
+		};
+
+		var _getSegmentByCoords = function _getSegmentByAxis (axis, value) {
+			//console.error(accumulatedGridSize);
+			value = !isNaN(_lastScrollPosition[axis]) ? value : 0;
+			for (var i=0; i < accumulatedGridSize[axis].length; i++) {
+				if (accumulatedGridSize[axis][i] > -1*value) {
+					return i;
+				}
+			}
+			return 0;
+		};
+
 		_updateSegments = function _updateSegments(scrollFinalised) {
 			var axis;
 			var newSegment = { x: 0, y: 0 };
-
 			// If snapping is disabled, return without any further action required
 			if (!_instanceOptions.snapping) {
 				return;
 			}
-
 			// Calculate the new segments
 			for (axis in _scrollableAxes) {
 				if (_scrollableAxes.hasOwnProperty(axis)) {
-					newSegment[axis] = Math.max(0, Math.min(Math.ceil(_metrics.content[axis] / _snapGridSize[axis]) - 1, Math.round(-_lastScrollPosition[axis] / _snapGridSize[axis])));
+					newSegment[axis] = _getSegmentByCoords(axis,_lastScrollPosition[axis] );
+					/*newSegment[axis] = Math.max(0, Math.min(Math.ceil(_metrics.content[axis] / _snapGridSize[axis]) - 1, Math.round(-_lastScrollPosition[axis] / _snapGridSize[axis])));*/
+					//newSegment[axis] = 1;
 				}
 			}
 
@@ -1590,7 +1701,6 @@ var FTScroller, CubicBezier;
 
 		_setAxisPosition = function _setAxisPosition(axis, position, animationDuration, animationBezier, boundsCrossDelay) {
 			var transitionCSSString, newPositionAtExtremity = null;
-
 			// Only update position if the axis node exists (DOM elements can go away if
 			// the scroller instance is not destroyed correctly)
 			if (!_scrollNodes[axis]) {
@@ -1698,8 +1808,6 @@ var FTScroller, CubicBezier;
 					_baseScrollPosition[axis] = offset;
 				}
 			}
-
-			_fireEvent('scroll', { scrollLeft: -_baseScrollPosition.x, scrollTop: -_baseScrollPosition.y });
 		};
 
 		/**
@@ -2187,6 +2295,7 @@ var FTScroller, CubicBezier;
 			get scrollWidth () { return _metrics.content.x; },
 			set scrollWidth (value) { throw new SyntaxError('scrollWidth is currently read-only - ignoring ' + value); },
 			get segmentCount () {
+				console.info('segmentCount');
 				if (!_instanceOptions.snapping) {
 					return { x: NaN, y: NaN };
 				}

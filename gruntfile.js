@@ -104,7 +104,6 @@ module.exports = function(grunt) {
 
       files: ['<%= files.js %>', '<%= files.grunt %>'],
       //js: ['js/*.js', 'js/app/app.js', 'js/app/views/*.js', 'js/app/model/*.js', 'js/app/collections/*.js'],
-      //ignores: ['js/*.js','js/main-optimized.js'],
       options: {
         jquery: true,
         smarttabs: true,
@@ -164,7 +163,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['<%= files.grunt %>', '<%= files.js %>'],
+      files: ['<%= files.grunt %>', '<%= files.js %>','js/require/*.js'],
       /*  js: {
         files: ['<%= files.js %>'],
         tasks: ['js']
@@ -208,7 +207,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('js', [
     'jshint',
-    'requirejs',
+   // 'requirejs',
     'concat:jsrequire', //optional
     'concat:jslibs', //optional
     'concat:jsmin', //optional
