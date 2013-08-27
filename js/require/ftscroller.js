@@ -1027,11 +1027,15 @@ var FTScroller, CubicBezier;
 
 						flingStartSegment = _getSegmentByCoords(axis,_lastScrollPosition[axis]);
 
-						var segmentTop = accumulatedGridSize[axis][flingStartSegment] - accumulatedGridSize[axis][0],
-							segmentNext = accumulatedGridSize[axis][flingStartSegment];
+						var 
+							segmentHeight = _snapGridSize[axis][_baseSegment[axis]][axis],
+							segmentTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]] - segmentHeight :0,
+							segmentPrevTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]-2]: 'ASDf',
+							segmentNext = accumulatedGridSize[axis][_baseSegment[axis]];
 
 
-						console.error('flingStartSegment',flingStartSegment,'flingPosition',flingPosition, 'segmentTop ',segmentTop,'segmentNext',segmentNext);
+
+						console.error('_baseSegment[axis]',_baseSegment[axis],'flingStartSegment',flingStartSegment,'flingPosition',flingPosition, 'segmentTop ',segmentTop,'segmentNext',segmentNext,'segmentHeight',segmentHeight,'segmentPrevTop',segmentPrevTop);
 
 
 						//next Segment
@@ -1041,21 +1045,28 @@ var FTScroller, CubicBezier;
 						if (flingStartSegment === 0 && flingPosition > 0 ) {
 							bounceDistance = segmentTop-flingPosition;
 							console.error('first segment top', 'bounceDistance',bounceDistance);
-
 						}else if (flingPosition < -segmentNext ) {
-							console.error('segment bottom', segmentTop, flingPosition);
+							console.error('Segment to next');
 							bounceDistance = segmentNext + flingPosition;
+						} else if (-flingPosition > segmentTop) {
+							console.error('BounceBack next');
+							bounceDistance = segmentTop+flingPosition;
+						}else if (-flingPosition < segmentPrevTop)  {
+							console.error('Segment to prev');
+							bounceDistance = segmentPrevTop+flingPosition;
+						}else if (-flingPosition < segmentTop) {
+							console.error('BounceBack prev');
+							bounceDistance = segmentTop+flingPosition;
+						}
+						// if (-flingPosition < segmentTop)  {
+						// 	console.error('Segment to prev OR BounceBack??');
+						// 	bounceDistance = segmentTop+flingPosition;
+						// 	//bounceDistance = (flingPosition-segmentTop);
+						// // Otherwise, if the movement speed was above the minimum velocity, continue
+						// // in the move direction.
+						// }
 
-						/*}else if (flingPosition > -_snapGridSize[axis][flingStartSegment-1][axis]) {
-							console.error(-_snapGridSize[axis][flingStartSegment-1][axis], flingPosition);
-							bounceDistance = _snapGridSize[axis][flingStartSegment-1][axis];
-						*/}else if (flingPosition > -segmentNext)  {
-							console.error('next');
-							bounceDistance = segmentNext+flingPosition;
-							console.error('WORK TODO')
-						// Otherwise, if the movement speed was above the minimum velocity, continue
-						// in the move direction.
-						} else if (Math.abs(movementSpeed) > _kMinimumSpeed) {
+					/*	} else if (Math.abs(movementSpeed) > _kMinimumSpeed) {
 
 							// Determine the target segment
 							if (movementSpeed < 0) {
@@ -1066,7 +1077,8 @@ var FTScroller, CubicBezier;
 
 							flingDuration = Math.min(_instanceOptions.maxFlingDuration, flingDuration * (flingPosition - _lastScrollPosition[axis]) / flingDistance);
 						}
-
+						*/
+						console.warn('bounceDistance',bounceDistance);
 					}
 
 					// Deal with cases where the target is beyond the bounds
