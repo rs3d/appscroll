@@ -37,7 +37,7 @@ define([
 				//paginatedSnap: true,
 				snapSizeY: this.getDimensions()
 			});
-			console.log(scroller);
+			//console.log(scroller);
 
 			// EVENTS
 			this.listenTo(vent, 'Router', this.router, this);
