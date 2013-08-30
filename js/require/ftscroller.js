@@ -1050,7 +1050,7 @@ var FTScroller, CubicBezier;
 							bounceDistance = segmentNext + flingPosition;
 						} else if (-flingPosition > segmentTop) {
 							console.error('BounceBack next');
-							bounceDistance = segmentTop+flingPosition;
+							//bounceDistance = segmentTop+flingPosition;
 						}else if (-flingPosition < segmentPrevTop)  {
 							console.error('Segment to prev');
 							bounceDistance = segmentPrevTop+flingPosition;
