@@ -1029,28 +1029,36 @@ var FTScroller, CubicBezier;
 
 						var 
 							segmentHeight = _snapGridSize[axis][_baseSegment[axis]][axis],
-							segmentTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]] - segmentHeight :0,
-							segmentPrevTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]-2]: 'ASDf',
+							segmentNext = accumulatedGridSize[axis][_baseSegment[axis]],
+							//segmentTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]] - segmentHeight :0,
+							segmentTop = segmentNext - segmentHeight,
+							segmentPrevTop = _baseSegment[axis] > 0 ? accumulatedGridSize[axis][_baseSegment[axis]-1]-_snapGridSize[axis][_baseSegment[axis]-1][axis]: -segmentHeight,
+							//segmentPrevTop = ,
+							segmentPrevHeight = segmentTop-segmentPrevTop,
 							segmentNext = accumulatedGridSize[axis][_baseSegment[axis]];
 
 
 
-						console.error('_baseSegment[axis]',_baseSegment[axis],'flingStartSegment',flingStartSegment,'flingPosition',flingPosition, 'segmentTop ',segmentTop,'segmentNext',segmentNext,'segmentHeight',segmentHeight,'segmentPrevTop',segmentPrevTop);
+						console.error('_baseSegment[axis]',_baseSegment[axis],'flingStartSegment',flingStartSegment,'flingPosition',flingPosition, 'segmentTop ',segmentTop,'segmentNext',segmentNext,'segmentHeight',segmentHeight,'segmentPrevTop',segmentPrevTop,'segmentPrevHeight',segmentPrevHeight);
 
 
 						//next Segment
 						//flingPosition = 400;
 						///console.error(flingStartSegment, -accumulatedGridSize[axis][flingStartSegment], flingPosition);
-						//
+
+						//console.info(segmentHeight, _metrics.container[axis]);
+
 						if (flingStartSegment === 0 && flingPosition > 0 ) {
 							bounceDistance = segmentTop-flingPosition;
 							console.error('first segment top', 'bounceDistance',bounceDistance);
 						}else if (flingPosition < -segmentNext ) {
 							console.error('Segment to next');
 							bounceDistance = segmentNext + flingPosition;
-						} else if (-flingPosition > segmentTop) {
+
+						} else if (segmentHeight <= _metrics.container[axis] &&
+							  -flingPosition > segmentTop) {
 							console.error('BounceBack next');
-							//bounceDistance = segmentTop+flingPosition;
+							bounceDistance = segmentTop+flingPosition;
 						}else if (-flingPosition < segmentPrevTop)  {
 							console.error('Segment to prev');
 							bounceDistance = segmentPrevTop+flingPosition;
