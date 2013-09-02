@@ -35,7 +35,7 @@ define([
 				scrollbars: false,
 				snapping: true,
 				//paginatedSnap: true,
-				snapSizeY: this.getDimensions()
+				snapSizeY: this.getDimensions(this.$sections)
 			});
 			console.log(scroller);
 
@@ -44,10 +44,14 @@ define([
 
 		},
 
-		getDimensions: function($el) {
+		getDimensions: function($els) {
 			var dimensions = [];
+			$els.each(function (i, el){
+				var $el = $(el);
+				dimensions.push({ x: $el.width(), y: $el.height()});
+			});
 
-			dimensions = [{
+			/*dimensions = [{
 					x: 400,
 					y: 300
 				}, {
@@ -66,7 +70,7 @@ define([
 					x: 400,
 					y: 400
 				}
-			];
+			];*/
 			return dimensions;
 
 		},
