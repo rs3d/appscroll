@@ -1563,6 +1563,7 @@ var FTScroller, CubicBezier;
 		};
 
 		var _sumDimensionGrid = function _sumDimensionGrid(grid) {
+			if (!isNaN(grid)) return grid;
 			var dimensions = { x: 0, y: 0};
 			grid.forEach (function(el){
 				dimensions.x += el.x;
@@ -1784,7 +1785,7 @@ console.log('_metrics', _metrics);
 					return sum;
 				},0);
 			}
-			console.log(accumulatedGridSize);
+			console.log('accumulatedGridSize',accumulatedGridSize);
 			return accumulatedGridSize;
 		};
 

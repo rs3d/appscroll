@@ -16,6 +16,7 @@ define([
 
 		events: {
 			'click a[href^=#]': 'onAnchorClick',
+			'click button.change.size': 'changeSize',
 			'submit form': 'submitForm'
 		},
 
@@ -30,17 +31,31 @@ define([
 			this.$loader = this.$el.find('#loading');
 			this.sectionIds = this.getIds(this.$sections);
 
-			var scroller = new FTScroller(document.getElementById('main'), {
+			this.scroller = new FTScroller(document.getElementById('main'), {
 				scrollingX: false,
 				scrollbars: false,
-				snapping: true
+				snapping: true,
 				//snapSizeY: this.getDimensions(this.$sections)
+				updateOnChanges: true,
+				updateOnWindowResize: true,
 			});
-			console.log(scroller);
+			console.log(this.scroller);
 
 			// EVENTS
 			this.listenTo(vent, 'Router', this.router, this);
+			this.scroller.addEventListener('segmentwillchange', this.onSegmentChange, this);
 
+		},
+
+		changeSize: function(e) {
+			var $el = $(e.currentTarget);
+			$el.parents('section:first').height(600);
+			this.scroller.updateDimensions();
+			//$el.parents('section:first').before('<section style="height: 600px">test</section>');
+		},
+
+		onSegmentChange: function (segment) {
+			console.warn('onSegmentChange', segment);
 		},
 
 		getDimensions: function($els) {
