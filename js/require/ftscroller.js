@@ -1603,6 +1603,11 @@ var FTScroller, CubicBezier;
 				}
 			}
 
+
+			_snapGridSize.y = _getChildrenDimensions();
+			_snapGridSize.userY = _snapGridSize.y;
+			console.log('update _snapGridSize',_snapGridSize);
+			
 			containerWidth = _containerNode.offsetWidth;
 			containerHeight = _containerNode.offsetHeight;
 
@@ -1757,6 +1762,15 @@ console.log('_metrics', _metrics);
 				}
 			}
 		};
+
+		var _getChildrenDimensions = function _getChildrenDimensions () {
+			var dimensions = [];
+			for(var i=0; i<_contentParentNode.children.length; i++) {
+			    dimensions.push({x:_contentParentNode.children[i].offsetWidth, y:_contentParentNode.children[i].offsetHeight});
+			}
+			//console.error(_contentParentNode, dimensions);
+			return dimensions;
+		}
 
 		var _getAccumulatedGridSize = function _cumulateGridSize (grid) {
 			var axis;

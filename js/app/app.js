@@ -33,9 +33,8 @@ define([
 			var scroller = new FTScroller(document.getElementById('main'), {
 				scrollingX: false,
 				scrollbars: false,
-				snapping: true,
-				//paginatedSnap: true,
-				snapSizeY: this.getDimensions(this.$sections)
+				snapping: true
+				//snapSizeY: this.getDimensions(this.$sections)
 			});
 			console.log(scroller);
 
